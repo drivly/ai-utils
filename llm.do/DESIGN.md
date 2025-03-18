@@ -38,14 +38,11 @@ llm.do is a plugin-based set of tools that wraps and retrofits AI SDKs and provi
   - Instructions
   - Chain-of-Draft Examples
   - Guardrails
-  - Tools, Models, Effort, Max Steps
-- `RunTask`
-  - `agent`
-  - `context`
-  - `question`
-  - `messages` OR `thread`
-  - `effort`
-  - `maxSteps`
+  - Tools, Model, Effort, Max Steps
+  - `Run`
+    - `context`
+    - `question`
+    - `messages` OR `thread`
 - Workflows
   - Status
     - Function
@@ -53,3 +50,4 @@ llm.do is a plugin-based set of tools that wraps and retrofits AI SDKs and provi
       - Guards
       - Function
   - Events
+  - `Run`
