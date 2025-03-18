@@ -6,7 +6,8 @@ import { generateObject } from 'ai'
 import rawModels from './models.json'
 import camelCase from 'camelcase'
 
-type Model = {
+export type Model = {
+  isComposite?: boolean
   name: string
   author: string
   parentModel?: string
@@ -23,6 +24,8 @@ type Model = {
     [key in Capability]?: (generateArgs: Parameters<typeof generateObject>[0]) => Partial<Parameters<typeof generateObject>[0]>
   }
   defaults?: Capability[]
+  childPriority?: 'first' | 'random'
+  childrenModels?: Model['name'][]
 }
 
 export function getModelOrGateway(provider: Provider, model: string, useGateway: boolean): LanguageModel {
@@ -32,8 +35,6 @@ export function getModelOrGateway(provider: Provider, model: string, useGateway:
   if (provider == 'google' && useGateway) {
     baseURL += '/v1beta'
   }
-
-  console.log(baseURL, provider)
 
   // We need to do this as unknown as LanguageModel because the SDKs all have
   // different types, which dont match the LanguageModel type.
@@ -75,7 +76,7 @@ const providerRewrites = {
   'Google AI Studio': 'google',
 }
 
-export const models: Model[] = rawModels.models.map(x => {
+let models: Model[] = rawModels.models.map(x => {
   const provider = providerRewrites[x.endpoint?.providerName as keyof typeof providerRewrites] ?? x.endpoint?.providerName
 
   const model: Model = {
@@ -89,12 +90,33 @@ export const models: Model[] = rawModels.models.map(x => {
   return model
 })
 
+models = models
+  .map(x => {
+    if (x.name.includes('Flash Thinking')) {
+      // We need to manually add the reasoning capability
+      x.capabilities = [...x.capabilities ?? [], 'reasoning']
+    }
+
+    return x
+  })
+
 // Virtual model to get any model that supports these capabilities
 models.push({
+  isComposite: true,
   name: 'frontier',
   author: 'drivly',
   provider: 'drivly',
   capabilities: [ 'reasoning', 'code', 'online' ],
   modelIdentifier: 'frontier',
-  
+  // Array of children models that will be checked for compatibility
+  // in order. First most compatible will be used.
+  childrenModels: [
+    'google/gemini-2.0-flash-001',
+    'google/gemini-2.0-flash-thinking-exp-01-21',
+    'anthropic/claude-3-7-sonnet-20250219',
+    'openai/gpt-4o',
+  ],
+  childPriority: 'random'
 })
+
+export { models }

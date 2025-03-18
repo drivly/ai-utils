@@ -1,4 +1,4 @@
-import { ParsedModelIdentifier, ThinkingLevel, Capability } from './types'
+import { ParsedModelIdentifier, ThinkingLevel, Capability, Provider } from './types'
 
 /**
  * Parse a model identification string into its components
@@ -14,53 +14,53 @@ export function parseModelIdentifier(modelIdentifier: string): ParsedModelIdenti
   const result: ParsedModelIdentifier = {
     model: '',
     capabilities: []
-  };
+  }
 
   // Remove @ if present
-  let identifier = modelIdentifier;
+  let identifier = modelIdentifier
   if (identifier.startsWith('@')) {
-    identifier = identifier.substring(1);
+    identifier = identifier.substring(1)
   }
 
   // Split by colon to separate model and capabilities
-  const [modelPart, capabilitiesPart] = identifier.split(':');
+  const [modelPart, capabilitiesPart] = identifier.split(':')
   
   // Handle capabilities if present
   if (capabilitiesPart) {
-    const capabilities = capabilitiesPart.split(',').map(c => c.trim()) as Capability[];
-    result.capabilities = capabilities;
+    const capabilities = capabilitiesPart.split(',').map(c => c.trim()) as Capability[]
+    result.capabilities = capabilities
     
-    // Check for thinking level
-    const thinkingCapability = capabilities.find(c => 
-      c === 'thinking' || c === 'thinking-low' || c === 'thinking-medium' || c === 'thinking-high'
-    );
+    // Check for reasoning level
+    const reasoningCapability = capabilities.find(c => 
+      c === 'reasoning' || c === 'reasoning-low' || c === 'reasoning-medium' || c === 'reasoning-high'
+    )
     
-    if (thinkingCapability) {
-      if (thinkingCapability === 'thinking') {
-        result.thinkingLevel = undefined; // Default level
-      } else {
-        // Extract the level part after the dash
-        const level = thinkingCapability.split('-')[1] as ThinkingLevel;
-        result.thinkingLevel = level;
-      }
-    }
+    // if (reasoningCapability) {
+    //   if (reasoningCapability === 'reasoning') {
+    //     result.reasoningLevel = undefined; // Default level
+    //   } else {
+    //     // Extract the level part after the dash
+    //     const level = reasoningCapability.split('-')[1] as ThinkingLevel;
+    //     result.reasoningLevel = level;
+    //   }
+    // }
   }
 
   // Parse the model part (provider/author/model or author/model)
-  const parts = modelPart.split('/');
+  const parts = modelPart.split('/')
   
   if (parts.length === 3) {
     // @provider/author/model format
-    [result.provider, result.author, result.model] = parts;
+    [result.provider, result.author, result.model] = parts as [Provider, string, string]
   } else if (parts.length === 2) {
     // author/model format
-    [result.author, result.model] = parts;
+    [result.author, result.model] = parts as [string, string]
   } else {
     // Just model name
-    result.model = modelPart;
+    result.model = modelPart as string
   }
 
-  return result;
+  return result
 }
 
 /**

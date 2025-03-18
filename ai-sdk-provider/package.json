@@ -1,12 +1,15 @@
 {
   "scripts": {
     "dev": "dotenvx run -- npx tsx watch src/demo.ts",
-    "build:models": "npx tsx build/build-models.ts"
+    "build:models": "npx tsx build/build-models.ts",
+    "test": "vitest run",
+    "test:watch": "vitest"
   },
   "type": "module",
   "packageManager": "pnpm@9.15.9",
   "devDependencies": {
-    "typescript": "^5.8.2"
+    "typescript": "^5.8.2",
+    "vitest": "^1.4.0"
   },
   "dependencies": {
     "@ai-sdk/anthropic": "^1.1.17",

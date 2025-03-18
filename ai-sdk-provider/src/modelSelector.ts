@@ -1,6 +1,7 @@
 import { Capability, LanguageModel, ParsedModelIdentifier, Provider, ModelConfig, ThinkingLevel } from './types'
 import { parseModelIdentifier, formatModelIdentifier } from './parser'
 import { models, getModelOrGateway } from './providers'
+import { Model } from './providers'
 
 /**
  * Check if model supports all required capabilities
@@ -9,14 +10,8 @@ function modelSupportsCapabilities(modelCapabilities: Capability[] = [], require
   return requiredCapabilities.every(cap => modelCapabilities.includes(cap))
 }
 
-/**
- * Convert model string to language model instance
- * Returns null if model is not supported
- */
-function getModel(modelIdentifier: string): LanguageModel | null {
+function getModelMetadata(modelIdentifier: string): { modelDetails: Model | null, parsed: ParsedModelIdentifier } {
   const parsed = parseModelIdentifier(modelIdentifier)
-
-  console.log(parsed)
 
   // Find matching model in our models array
   const modelDetails = models.find(model => 
@@ -24,7 +19,20 @@ function getModel(modelIdentifier: string): LanguageModel | null {
     (!parsed.author || model.author === parsed.author) &&
     (!parsed.model || model.name === parsed.model || model.modelIdentifier === parsed.model)
   )
-  
+
+  return {
+    modelDetails: modelDetails ?? null,
+    parsed
+  }
+}
+
+/**
+ * Convert model string to language model instance
+ * Returns null if model is not supported
+ */
+function getModel(modelIdentifier: string): LanguageModel | null {
+  const { modelDetails, parsed } = getModelMetadata(modelIdentifier)
+
   if (!modelDetails) {
     return null
   }
@@ -58,8 +66,22 @@ export function getSupportedModel(
   config?: ModelConfig
 ): LanguageModel {
   // Handle array or single model input
-  const modelOptions = Array.isArray(modelInput) ? modelInput : [modelInput]
-  
+  let modelOptions = Array.isArray(modelInput) ? modelInput : [modelInput]
+  const { modelDetails, parsed } = getModelMetadata(modelOptions[0])
+
+  // If this model is a composite model, we need to get the children models
+  // but we need to use the requested capabilities to determine which child model to use
+  if (modelDetails?.isComposite) {
+    console.log(
+      'Composite model in use, looking for a child model with capabilities:',
+      parsed.capabilities
+    )
+
+    const childrenModels = modelDetails.childrenModels || []
+
+    modelOptions = childrenModels.map(x => `${x}:${parsed.capabilities.join(',')}`)
+  }
+
   // Add fallbacks from config
   if (config?.fallbackModels) {
     modelOptions.push(...config.fallbackModels)
@@ -78,6 +100,10 @@ export function getSupportedModel(
           continue // Try next model
         }
       }
+
+      console.log(
+        `Using model: ${modelString} with capabilities: ${ parsed.capabilities.join(', ') }`
+      )
       
       return model
     }

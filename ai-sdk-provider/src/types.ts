@@ -4,6 +4,7 @@ export type { LanguageModel } from 'ai'
 
 // All of our providers
 export type Provider = 
+  | 'drivly'
   | 'openai'
   | 'anthropic'
   | 'google'
@@ -16,10 +17,10 @@ export type Provider =
 export type Capability = 
   | 'code'
   | 'online'
-  | 'thinking'
-  | 'thinking-low'
-  | 'thinking-medium'
-  | 'thinking-high'
+  | 'reasoning'
+  | 'reasoning-low'
+  | 'reasoning-medium'
+  | 'reasoning-high'
   | 'tools'
   | 'structuredOutput'
   | 'responseFormat'
