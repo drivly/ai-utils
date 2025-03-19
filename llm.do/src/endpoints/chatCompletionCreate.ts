@@ -7,14 +7,13 @@ export class ChatCompletionCreate extends OpenAPIRoute {
     tags: ['chat'],
     summary: 'Create a new Chat Completion',
     request: {
+      headers: z.object({
+        Authorization: z.string(),
+      }),
       body: {
         content: {
           'application/json': {
-            schema: z
-              .object({
-                apiKey: z.string(),
-              })
-              .merge(ChatCompletionRequest),
+            schema: ChatCompletionRequest,
           },
         },
       },
@@ -32,11 +31,11 @@ export class ChatCompletionCreate extends OpenAPIRoute {
   }
 
   async handle(_args: any[]) {
-    // Get validated data
-    const data = await this.getValidatedData<typeof this.schema>()
-
-    // Retrieve the validated request body
-    const { apiKey, ...chatCompletionRequestBody } = data.body
+    // Retrieve the validated request
+    const {
+      body: chatCompletionRequestBody,
+      headers: { Authorization: apiKey },
+    } = await this.getValidatedData<typeof this.schema>()
 
     // Pass request to OpenRouter
     const response = await fetch(
@@ -45,7 +44,7 @@ export class ChatCompletionCreate extends OpenAPIRoute {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',
-          'Authorization': `Bearer ${apiKey}`,
+          'Authorization': apiKey,
         },
         body: JSON.stringify(chatCompletionRequestBody),
       },

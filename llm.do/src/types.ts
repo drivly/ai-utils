@@ -245,7 +245,14 @@ export const ChatCompletionResponse = z.object({
             }),
           )
           .optional(),
-        audio: z.object({}).optional(),
+        audio: z
+          .object({
+            data: z.string(),
+            expires_at: z.number(),
+            id: z.string(),
+            transcript: z.string(),
+          })
+          .optional(),
         tool_calls: z
           .array(
             z.object({
@@ -264,7 +271,7 @@ export const ChatCompletionResponse = z.object({
   created: z.number(),
   id: z.string(),
   model: z.string(),
-  object: z.string(),
+  object: z.literal('chat.completion'),
   service_tier: z.string().optional(),
   system_fingerprint: z.string(),
   usage: z.object({
