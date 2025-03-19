@@ -5,7 +5,7 @@ import { ChatCompletionRequest, ChatCompletionResponse } from '../types'
 export class ChatCompletionCreate extends OpenAPIRoute {
   schema = {
     tags: ['chat'],
-    summary: 'Create a new Chat Completion',
+    summary: 'Create a chat completion',
     request: {
       headers: z.object({
         Authorization: z.string(),
@@ -20,7 +20,7 @@ export class ChatCompletionCreate extends OpenAPIRoute {
     },
     responses: {
       '200': {
-        description: 'Returns the created task',
+        description: 'Returns the chat completion',
         content: {
           'application/json': {
             schema: ChatCompletionResponse,
