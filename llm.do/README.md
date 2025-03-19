@@ -1,4 +1,4 @@
-# llms.do
+# llm.do
 
 llm.do is a plugin-based set of tools that helps you build, run and evaluate AI-powered agents using a variety of AI models. It includes:
 
