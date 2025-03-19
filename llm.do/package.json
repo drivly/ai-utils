@@ -1,5 +1,5 @@
 {
-	"name": "cloudflare-workers-openapi",
+	"name": "llm.do",
 	"version": "0.0.1",
 	"private": true,
 	"scripts": {
@@ -17,6 +17,14 @@
 		"@cloudflare/workers-types": "^4.20250317.0",
 		"@types/node": "20.8.3",
 		"@types/service-worker-mock": "^2.0.1",
+		"typescript": "^5.8.2",
 		"wrangler": "^4.1.0"
+	},
+	"pnpm": {
+		"onlyBuiltDependencies": [
+			"esbuild",
+			"sharp",
+			"workerd"
+		]
 	}
 }
