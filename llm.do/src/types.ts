@@ -76,7 +76,7 @@ export const ChatCompletionRequest = z.object({
       .or(
         z.object({
           role: z.literal('assistant'),
-          audio: z.object({}).optional(),
+          audio: z.object({ id: z.string() }).optional(),
           content: z
             .string()
             .or(
@@ -116,7 +116,7 @@ export const ChatCompletionRequest = z.object({
     })
     .or(z.null())
     .optional(),
-  frequency_penalty: z.number().max(2).min(-2).or(z.null()).optional(),
+  frequency_penalty: z.number().max(2).min(-2).optional(),
   function_call: z
     .string()
     .or(z.object({ name: z.string() }))
@@ -126,20 +126,20 @@ export const ChatCompletionRequest = z.object({
       z.object({
         name: z.string(),
         description: z.string(),
-        parameters: z.object({}).optional(),
+        parameters: z.any().optional(),
       }),
     )
     .optional(),
   logit_bias: z.record(z.number()).optional(),
-  logprobs: z.boolean().or(z.null()).optional(),
-  max_completion_tokens: z.number().or(z.null()).optional(),
-  max_tokens: z.number().or(z.null()).optional(),
-  metadata: z.map(z.string(), z.string()).optional(),
+  logprobs: z.boolean().optional(),
+  max_completion_tokens: z.number().optional(),
+  max_tokens: z.number().optional(),
+  metadata: z.record(z.string()).optional(),
   modalities: z
     .array(z.enum(['text', 'audio', 'image', 'video']))
     .or(z.null())
     .optional(),
-  n: z.number().or(z.null()).optional(),
+  n: z.number().optional(),
   parallel_tool_calls: z.boolean().optional(),
   prediction: z
     .object({
@@ -154,17 +154,17 @@ export const ChatCompletionRequest = z.object({
       type: z.literal('content'),
     })
     .optional(),
-  presence_penalty: z.number().or(z.null()).optional(),
-  reasoning_effort: z.string().or(z.null()).optional(),
+  presence_penalty: z.number().optional(),
+  reasoning_effort: z.string().optional(),
   response_format: z
     .object({ type: z.literal('json_object') })
     .or(z.object({ type: z.literal('json_schema'), json_schema: z.any() }))
     .optional(),
-  seed: z.number().or(z.null()).optional(),
-  service_tier: z.enum(['default', 'auto']).or(z.null()).optional(),
-  stop: z.string().or(z.array(z.string())).or(z.null()).optional(),
-  store: z.boolean().or(z.null()).optional(),
-  stream: z.boolean().or(z.null()).optional(),
+  seed: z.number().optional(),
+  service_tier: z.enum(['default', 'auto']).optional(),
+  stop: z.string().or(z.array(z.string())).optional(),
+  store: z.boolean().optional(),
+  stream: z.boolean().optional(),
   stream_options: z
     .object({
       include_usage: z.boolean().optional(),
@@ -189,13 +189,13 @@ export const ChatCompletionRequest = z.object({
           name: z.string(),
           description: z.string().optional(),
           parameters: z.any().optional(),
-          strict: z.boolean().or(z.null()).optional(),
+          strict: z.boolean().optional(),
         }),
         type: z.string(),
       }),
     )
     .optional(),
-  top_logprobs: z.number().min(0).max(20).or(z.null()).optional(),
+  top_logprobs: z.number().min(0).max(20).optional(),
   top_p: z.number().optional(),
   user: z.string().optional(),
   web_search_options: z

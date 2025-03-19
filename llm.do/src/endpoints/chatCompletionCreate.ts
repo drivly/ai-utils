@@ -1,15 +1,20 @@
 import { OpenAPIRoute } from 'chanfana'
+import { z } from 'zod'
 import { ChatCompletionRequest, ChatCompletionResponse } from '../types'
 
 export class ChatCompletionCreate extends OpenAPIRoute {
   schema = {
-    tags: ['chat', 'completion'],
+    tags: ['chat'],
     summary: 'Create a new Chat Completion',
     request: {
       body: {
         content: {
           'application/json': {
-            schema: ChatCompletionRequest,
+            schema: z
+              .object({
+                apiKey: z.string(),
+              })
+              .merge(ChatCompletionRequest),
           },
         },
       },
@@ -31,11 +36,22 @@ export class ChatCompletionCreate extends OpenAPIRoute {
     const data = await this.getValidatedData<typeof this.schema>()
 
     // Retrieve the validated request body
-    const taskToCreate = data.body
+    const { apiKey, ...chatCompletionRequestBody } = data.body
 
-    // TODO: Pass request to OpenRouter
+    // Pass request to OpenRouter
+    const response = await fetch(
+      `https://gateway.ai.cloudflare.com/v1/b6641681fe423910342b9ffa1364c76d/ai-functions/openrouter/v1/chat/completions`,
+      {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+          'Authorization': `Bearer ${apiKey}`,
+        },
+        body: JSON.stringify(chatCompletionRequestBody),
+      },
+    )
 
     // return the completion
-    return taskToCreate
+    return response.json()
   }
 }
